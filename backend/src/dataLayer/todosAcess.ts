@@ -65,6 +65,9 @@ export class TodosAccess {
 
     async createTodoItem(todoItem: TodoItem): Promise<TodoItem> {
         logger.info('Creating todo item function called')
+        if (!todoItem.name) {
+            throw new Error('Todo name can not blank')
+        }
         const result = await this.docClient
         .put({
             TableName: this.todosTable,
