@@ -12,8 +12,13 @@ export const handler = middy(
     // TODO: Implement creating a new TODO item
     const userId = getUserId(event)
     const newItem = await createTodo(newTodo, userId)
+    const headers = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true
+    };
     return {
       statusCode: 201,
+      headers,
       body: JSON.stringify({
           item: newItem,
       })
