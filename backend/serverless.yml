@@ -1,7 +1,7 @@
 org: sangpham27
 app: sangpham27
 service: serverless-todo-app-v1
-frameworkVersion: '3.23.0'
+frameworkVersion: '3.32.2'
 
 plugins:
   - serverless-webpack
@@ -26,7 +26,7 @@ provider:
     TODOS_TABLE: Serverless-c5-todo-app-5-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
     CONNECTIONS_TODO_TABLE: Connections-todo-${self:provider.stage}
-    ATTACHMENT_S3_BUCKET: sangpt-serverless-todo-images-${self:provider.stage}
+    ATTACHMENT_S3_BUCKET: sangpt-serverless-todo-c5-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
     PROJECT_NAME: serverless-toto-app-1
     INDEX_NAME: ${self:provider.environment.TODOS_CREATED_AT_INDEX}
@@ -68,6 +68,26 @@ functions:
         Action:
           - dynamodb:Query
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.INDEX_NAME}
+
+  # TODO: Configure this function -
+  # Provide iamRoleStatements property for performing Actions on DynamoDB
+  SearchTodos:
+    handler: src/lambda/http/searchTodo.handler
+    events:
+      - http:
+          method: get
+          authorizer: Auth
+          path: search-todo
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                name: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
   # TODO: Configure this function -
   # Provide iamRoleStatements property. Decide the Actions and AWS Resource.
