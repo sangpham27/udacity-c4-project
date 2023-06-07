@@ -14,7 +14,7 @@ import {
   Loader
 } from 'semantic-ui-react'
 
-import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
+import { createTodo, deleteTodo, getTodos, patchTodo, searchTodo } from '../api/todos-api'
 import Auth from '../auth/Auth'
 import { Todo } from '../types/Todo'
 
@@ -27,17 +27,33 @@ interface TodosState {
   todos: Todo[]
   newTodoName: string
   loadingTodos: boolean
+  searchKeyWords: string
 }
 
 export class Todos extends React.PureComponent<TodosProps, TodosState> {
   state: TodosState = {
     todos: [],
     newTodoName: '',
-    loadingTodos: true
+    loadingTodos: true,
+    searchKeyWords: '',
   }
 
   handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ newTodoName: event.target.value })
+  }
+
+  handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ searchKeyWords: event.target.value })
+  }
+
+  onSearchTodo = async () => {
+    try {
+      const { searchKeyWords } = this.state
+      const todos = await searchTodo(searchKeyWords, this.props.auth.getIdToken())
+      this.setState({ todos, loadingTodos: false })
+    } catch (error) {
+      alert('not found')
+    }
   }
 
   onEditButtonClick = (todoId: string) => {
@@ -131,6 +147,18 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
             onChange={this.handleNameChange}
           />
         </Grid.Column>
+        <Grid.Column width={16}>
+          <Divider />
+        </Grid.Column>
+          <Input 
+            action={{
+              icon: 'search',
+              onClick: this.onSearchTodo
+            }}
+            fluid 
+            placeholder='Search...' 
+            onChange={this.handleSearchChange}
+          />
         <Grid.Column width={16}>
           <Divider />
         </Grid.Column>

@@ -35,6 +35,10 @@ export const createTodo = async (
     return await todosAccess.createTodoItem(newItem)
 }
 
+export async function searchTodo(name: string, userId: string) {
+  return await todosAccess.searchTodo(name, userId)
+}
+
 export async function updateTodo(
     todoId: string,
     userId: string,

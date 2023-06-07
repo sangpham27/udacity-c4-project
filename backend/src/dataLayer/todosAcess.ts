@@ -45,6 +45,26 @@ export class TodosAccess {
         return items as TodoItem[] 
     }
 
+    async searchTodo(todoName: string, userId: string): Promise<TodoItem[]> {
+        // search todo
+        const params = {
+            TableName: this.todosTable,
+            FilterExpression: 'contains(#todoName, :task_name)',
+            KeyConditionExpression: 'userId = :userId',
+            ExpressionAttributeNames: {
+                '#todoName': 'name'
+            },
+            ExpressionAttributeValues: {
+                ':task_name': todoName,
+                ':userId': userId
+            }
+       }
+       const result = await this.docClient.query(params).promise()
+
+       const items = result.Items
+       return items as TodoItem[]
+    }
+
     async getTodo(todoId: string, userId: string): Promise<TodoItem> {
         const result = await this.docClient
           .query({
